@@ -68,6 +68,9 @@ ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
 ${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
 ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
+  boost_filesystem
+  boost_system
+${EXTERNAL_LIBS}
 )
 
 # Build examples
@@ -97,4 +100,3 @@ target_link_libraries(mono_kitti ${PROJECT_NAME})
 add_executable(mono_dte
 Examples/Monocular/mono_dte.cc)
 target_link_libraries(mono_dte ${PROJECT_NAME})
-

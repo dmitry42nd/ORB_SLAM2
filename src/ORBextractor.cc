@@ -1040,6 +1040,18 @@ static void computeDescriptors(const Mat& image, vector<KeyPoint>& keypoints, Ma
         computeOrbDescriptor(keypoints[i], image, &pattern[0], descriptors.ptr((int)i));
 }
 
+static int DEBUG_cnt = 0;
+void DEBUG_writeORBKeys(Mat const& _image, vector<KeyPoint> const& _keypoints)
+{
+    Mat img;
+    cv::cvtColor(_image, img, CV_GRAY2BGR);
+    for(auto k : _keypoints)
+    {
+        cv::circle(img, k.pt, 3, cv::Scalar(0, 250, 0));
+    }
+    imwrite("DEBUG/" + std::to_string(DEBUG_cnt++) + ".png", img);
+}
+
 void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPoint>& _keypoints,
                       OutputArray _descriptors)
 { 
@@ -1102,6 +1114,8 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
         // And add the keypoints to the output
         _keypoints.insert(_keypoints.end(), keypoints.begin(), keypoints.end());
     }
+
+    //DEBUG_writeORBKeys(_image.getMat(), _keypoints);
 }
 
 void ORBextractor::ComputePyramid(cv::Mat image)
