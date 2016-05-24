@@ -60,8 +60,7 @@ src/Frame.cc
 src/KeyFrameDatabase.cc
 src/Sim3Solver.cc
 src/Initializer.cc
-src/Viewer.cc
-)
+src/Viewer.cc)
 
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
@@ -94,4 +93,8 @@ target_link_libraries(mono_tum ${PROJECT_NAME})
 add_executable(mono_kitti
 Examples/Monocular/mono_kitti.cc)
 target_link_libraries(mono_kitti ${PROJECT_NAME})
+
+add_executable(mono_dte
+Examples/Monocular/mono_dte.cc)
+target_link_libraries(mono_dte ${PROJECT_NAME})
 
