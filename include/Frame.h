@@ -154,6 +154,7 @@ public:
 
     // Flag to identify outlier associations.
     std::vector<bool> mvbOutlier;
+    std::vector<bool> mvbPotentialDynamic;
 
     // Keypoints are assigned to cells in a grid to reduce matching complexity when projecting MapPoints.
     static float mfGridElementWidthInv;

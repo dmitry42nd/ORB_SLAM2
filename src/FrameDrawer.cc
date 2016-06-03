@@ -35,6 +35,7 @@ FrameDrawer::FrameDrawer(Map* pMap):mpMap(pMap)
     mIm = cv::Mat(480,640,CV_8UC3, cv::Scalar(0,0,0));
 }
 
+static int DEBUG_cnt = 0;
 cv::Mat FrameDrawer::DrawFrame()
 {
     cv::Mat im;
@@ -42,6 +43,7 @@ cv::Mat FrameDrawer::DrawFrame()
     vector<int> vMatches; // Initialization: correspondeces with reference keypoints
     vector<cv::KeyPoint> vCurrentKeys; // KeyPoints in current frame
     vector<bool> vbVO, vbMap; // Tracked MapPoints in current frame
+    vector<bool> vbOut;
     int state; // Tracking state
 
     //Copy variables within scoped mutex
@@ -64,6 +66,7 @@ cv::Mat FrameDrawer::DrawFrame()
             vCurrentKeys = mvCurrentKeys;
             vbVO = mvbVO;
             vbMap = mvbMap;
+            vbOut = mvbOut;
         }
         else if(mState==Tracking::LOST)
         {
@@ -113,13 +116,20 @@ cv::Mat FrameDrawer::DrawFrame()
                     cv::rectangle(im,pt1,pt2,cv::Scalar(255,0,0));
                     cv::circle(im,vCurrentKeys[i].pt,2,cv::Scalar(255,0,0),-1);
                     mnTrackedVO++;
+
                 }
+            }
+            if(vbOut[i])
+            {
+                cv::circle(im,vCurrentKeys[i].pt,3,cv::Scalar(255,255,0),-1);
+                //std::cout << "outlier!\n";
             }
         }
     }
 
     cv::Mat imWithInfo;
     DrawTextInfo(im,state, imWithInfo);
+    cv::imwrite("DEBUG_Outliers/" + std::to_string(DEBUG_cnt++) + ".png", im);
 
     return imWithInfo;
 }
@@ -171,6 +181,7 @@ void FrameDrawer::Update(Tracking *pTracker)
     N = mvCurrentKeys.size();
     mvbVO = vector<bool>(N,false);
     mvbMap = vector<bool>(N,false);
+    mvbOut = vector<bool>(N,false);
     mbOnlyTracking = pTracker->mbOnlyTracking;
 
 
@@ -193,6 +204,11 @@ void FrameDrawer::Update(Tracking *pTracker)
                     else
                         mvbVO[i]=true;
                 }
+                else
+                {
+                    mvbOut[i] = true;
+                }
+
             }
         }
     }

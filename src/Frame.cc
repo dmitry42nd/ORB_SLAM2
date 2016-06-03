@@ -58,6 +58,23 @@ Frame::Frame(const Frame &frame)
 }
 
 
+static int DEBUG_cnt = 0;
+void DEBUG_drawStereoMatches(cv::Mat const& _image, std::vector<float> const& mvuRight, std::vector<cv::KeyPoint> const& mvKeys)
+{
+  cv::Mat img;
+  cv::cvtColor(_image, img, CV_GRAY2BGR);
+  for(auto k  = 0; k < mvKeys.size(); k++)
+  {
+      if(mvuRight[k] != -1)
+        cv::circle(img, mvKeys[k].pt, 3, cv::Scalar(0, 250, 0));
+      //else
+        //std::cout << "no match\n";
+  }
+    cv::imwrite("DEBUG_StereoMatches/" + std::to_string(DEBUG_cnt++) + ".png", img);
+}
+
+
+//Stereo frame
 Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeStamp, ORBextractor* extractorLeft, ORBextractor* extractorRight, ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth)
     :mpORBvocabulary(voc),mpORBextractorLeft(extractorLeft),mpORBextractorRight(extractorRight), mTimeStamp(timeStamp), mK(K.clone()),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth),
      mpReferenceKF(static_cast<KeyFrame*>(NULL))
@@ -89,8 +106,11 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 
     ComputeStereoMatches();
 
+    DEBUG_drawStereoMatches(imLeft, mvuRight, mvKeys);
+
     mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));    
     mvbOutlier = vector<bool>(N,false);
+    mvbPotentialDynamic = vector<bool>(N,false);
 
 
     // This is done only for the first Frame (or after a change in the calibration)
